@@ -35,17 +35,65 @@ class NodeList:
             self.__end = self.__end.next
         self.__length += 1
 
-    def get_item(self, index):
+    def insert(self, index, value):
+        no = Node(value)
+        if index >= self.__length:
+            self.append(value)
+        elif index == 0:
+            no.next = self.__begin
+            self.__begin = no
+            self.__length += 1
+        else:
+            novo_perc = self.__get_perc(index - 1)
+            no.next = novo_perc.next
+            novo_perc.next = no
+            self.__length += 1
+
+    def update_value(self, index, value):
+        self.validate(index=index)
+        perc = self.__get_perc(index)
+        perc.value = value
+
+    def get_index(self, value):
+        pass
+        # retornar o index (posição) do primeiro elemento
+        # que encontrar na lista
+        # caso não encontre, retornar um raise ValueError()
+
+    def clear(self):
+        pass
+        # remove todos os ementos da lista
+
+    def remove(self, index):
+        pass
+        # 1 - O index deve ser menor que o tamanho da lista
+        # 2 - Se o index for igual a 0
+        # 2.1 - colocar o apontando no proximo item
+        # 3 - se o index for <= ao tamanho-1 da lista
+        # 3.1 - Colocar um apontador no anterior da remoção
+        # 3.2 - O end aponta para esse apontador
+        # 3.3 - O next do novo end aponta para None
+
+    def extend(self, other_list):
+        pass
+        # 1 - Validar se o other_list é do tipo NodeList
+        # 2 - percorrer o other_list e adicionar para elemento ns lista atual
+
+    def __get_perc(self, index):
         self.validate(index=index)
         if index == 0:
-            return self.__begin.value
+            return self.__begin
         elif index == self.__length - 1:
-            return self.__end.value
+            return self.__end
         else:
             perc = self.__begin
             for i in range(index):
                 perc = perc.next
-            return perc.value
+            return perc
+
+    def get_item(self, index):
+        perc = self.__get_perc(index)
+        return perc.value
 
     def get_length(self) -> int:
         return self.__length
@@ -61,3 +109,12 @@ class NodeList:
         else:
             value += f'{perc.value}'
         return f'[{value}]'
+
+    def __len__(self):
+        return self.get_length()
+
+    def __getitem__(self, index):
+        return self.get_item(index)
+
+    def __setitem__(self, key, value):
+        self.update_value(key, value)
