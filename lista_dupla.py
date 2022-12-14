@@ -2,12 +2,13 @@ class Node:
     def __init__(self, value):
         self.value = value
         self.next = None
+        self.previous = None
 
     def __str__(self):
         return str(self.value)
 
 
-class NodeList:
+class DoubledList:
 
     def __init__(self, max_length=None, force_type=None):
         self.__begin = None
@@ -15,6 +16,7 @@ class NodeList:
         self.__length = 0
         self.__max_length = max_length
         self.force_type = force_type
+        self.teste = 'teste'
 
     def validate(self, value=None, index=None):
         if self.__max_length and self.__length >= self.__max_length:
@@ -32,6 +34,7 @@ class NodeList:
             self.__end = no
         else:
             self.__end.next = no
+            no.previous = self.__end
             self.__end = self.__end.next
         self.__length += 1
 
@@ -41,12 +44,16 @@ class NodeList:
             self.append(value)
         elif index == 0:
             no.next = self.__begin
+            self.__begin.previous = no
             self.__begin = no
             self.__length += 1
         else:
-            novo_perc = self.__get_perc(index - 1)
-            no.next = novo_perc.next
-            novo_perc.next = no
+            novo_perc = self.__get_perc(index)
+            perc_previous = novo_perc.previous
+            no.next = novo_perc
+            no.previous = perc_previous
+            novo_perc.previous = no
+            perc_previous.next = no
             self.__length += 1
 
     def update_value(self, index, value):
@@ -79,16 +86,33 @@ class NodeList:
         # 1 - Validar se o other_list é do tipo NodeList
         # 2 - percorrer o other_list e adicionar para elemento ns lista atual
 
+    # def test(self,index):
+    #     return self.__get_perc(index)
+
     def __get_perc(self, index):
         self.validate(index=index)
+        point_index = self.__length - 1
         if index == 0:
             return self.__begin
-        elif index == self.__length - 1:
+        elif index == point_index:
             return self.__end
         else:
-            perc = self.__begin
-            for i in range(index):
-                perc = perc.next
+            point = 0
+            next = True
+            if index < (self.__length / 2):
+                perc = self.__begin
+                point = index
+            else:
+                perc = self.__end
+                point = point_index - index
+                next = False
+
+            for i in range(point):
+                if next:
+                    perc = perc.next
+                else:
+                    perc = perc.previous
+
             return perc
 
     def get_item(self, index):
@@ -98,17 +122,24 @@ class NodeList:
     def get_length(self) -> int:
         return self.__length
 
-    def __str__(self):
+    def __print(self, reverse=False):
         if self.__begin is None:
             return '[]'
         value = ''
-        perc = self.__begin
-        while perc.next:
+        perc = self.__begin if not reverse else self.__end
+        apont = 'next' if not reverse else 'previous'
+        while getattr(perc, apont):
             value += f'{perc.value}, '
-            perc = perc.next
+            perc = getattr(perc, apont)
         else:
             value += f'{perc.value}'
         return f'[{value}]'
+
+    def __str__(self):
+        return self.__print()
+
+    def print_reverse(self):
+        return self.__print(True)
 
     def __len__(self):
         return self.get_length()
