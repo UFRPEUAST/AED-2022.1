@@ -50,4 +50,3 @@ print(list1)
 lista.update_value(4, 100)
 print(lista)
 print(lista.print_reverse())
-
