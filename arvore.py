@@ -8,7 +8,7 @@ class No:
     def __str__(self):
         return f'{self.value}'
 
-    def is_folha(self):
+    def is_leaf(self):
         return self.right is None and self.left is None
 
 
@@ -65,7 +65,6 @@ class Tree:
         print(self.raiz.value)
         print(self.raiz.left.value)
         print(self.raiz.right.value)
-        return
 
     def _get_perc(self, perc, value, ant=None):
         if not perc or perc.value == value:
@@ -88,60 +87,56 @@ class Tree:
                 perc = perc.left
         return perc
 
-    def _get_sucessor(self, perc):
-        sucessor = perc.right
-        ant = None
-        if not sucessor:
-            return None
-        while sucessor.left:
-            ant = sucessor
-            sucessor = sucessor.left
-        return sucessor, ant
+    def _get_min(self, no):
+        perc = no
+        while perc.left:
+            perc = perc.left
+        return perc
+
+    def _get_max(self, no):
+        pred = no
+        while pred.right:
+            pred = pred.right
+        return pred
+
+    def _get_sucessor(self, no):
+        sucessor = self._get_min(no.right)
+        return sucessor
+
+    def _get_predecessor(self, no):
+        perc = self._get_max(no.left)
+        return perc
 
     def remove(self, value):
         perc, ant = self._get_perc(self.raiz, value)
         if perc:
-            if perc.is_folha():
-                if perc.value > ant.value:
-                    ant.right = None
-                else:
+            # 1 - saber se o No é uma folha
+            if perc.is_leaf():
+                if ant.value > perc.value:
                     ant.left = None
+                else:
+                    ant.right = None
                 return True
+            sucessor = self._get_sucessor(perc)
+            ant_sucessor = self._get_perc(perc, sucessor.value)[1]
+            # predecessor = self._get_predecessor(perc)
+            # if predecessor.is_leaf():
+            #     print('----')
+            # else:
+            perc.value = sucessor.value
+            if ant_sucessor.value>sucessor.value:
+                ant_sucessor.left = sucessor.right
+                sucessor.right = None
             else:
-                sucessor, ant_sucessor = self._get_sucessor(perc)
-                if sucessor:
-                    sucessor.nivel = perc.nivel
-                    ant.right = sucessor
-                    sucessor.left = perc.left
-                    ant_sucessor.left = sucessor.right
-                    sucessor.right = perc.right
-                    return True
-                # predecessor =
-                # if predecessor:
-                #     ....
-        return False
-
-        # o menor elemento da arvore da direita
-        # do nó que vamos remover
-        delete_no = self.get(value)
-        if not delete_no:
-            return False
-        sucessor, anterior = self._get_sucessor(delete_no)
-        if sucessor:
-            sucessor.left = delete_no.left
-            anterior.left = sucessor.right
-            sucessor.right = delete_no.right
-            delete_no.right = None
-            delete_no.left = None
-
-            print('VAMOS REMOVERS')
+                ant_sucessor.right = sucessor.left
+                sucessor.left = None
             return True
-        # Maior elemento da arvore da esquerda
-        # dor nó que vai remover
-        # predecessor = self._get_predecessor(value)
-        # if predecessor:
-        #     print('VAMOS REMOVERS')
-        #     return True
+            # print('***', perc)
+            # print('***', ant)
+            # print('***', sucessor)
+            # print('***', ant_sucessor)
+            # print('***', predecessor)
+
         return False
 
 
@@ -151,11 +146,13 @@ arvore.add(50)
 arvore.add(30)
 arvore.add(25)
 arvore.add(69)
-
 arvore.add(60)
+arvore.add(75)
 arvore.add(72)
 arvore.add(65)
-arvore.add(71)
+arvore.add(78)
+arvore.add(35)
+arvore.add(73)
 # print('PRE----')
 # arvore.pre_ordem()
 # print('IN----')
@@ -163,9 +160,14 @@ arvore.add(71)
 # print('POS----')
 # arvore.pos_ordem()
 
-print('BUSCA')
-no = arvore.get(60)
-print(no)
-
-print(arvore.remove(25))
+# no = arvore.get(60)
+print(arvore.in_ordem())
+# print(arvore.remove(25))
 print(arvore.remove(69))
+print(arvore.remove(30))
+print(arvore.remove(50))
+print(arvore.remove(60))
+print('----')
+print(arvore.in_ordem())
+
+print('******')
